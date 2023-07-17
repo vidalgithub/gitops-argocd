@@ -1,0 +1,97 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: app-ingress-external-dns
+  labels:
+    app: app-ingress
+  annotations:
+    kubernetes.io/ingress.class: "alb" 
+    alb.ingress.kubernetes.io/load-balancer-name: external-dns-ingress
+    alb.ingress.kubernetes.io/scheme: internet-facing
+    alb.ingress.kubernetes.io/target-type: ip
+    alb.ingress.kubernetes.io/healthcheck-protocol: HTTP 
+    # Manually enable publics subnets for ALB discovery
+    #alb.ingress.kubernetes.io/subnets: subnet-0020f92d21bc577aa, subnet-0d4107969fb51f96b
+    # Heath check settings
+    # alb.ingress.kubernetes.io/healthcheck-port: '80'
+    alb.ingress.kubernetes.io/healthcheck-port: traffic-port  
+    alb.ingress.kubernetes.io/healthcheck-interval-seconds: '15'
+    alb.ingress.kubernetes.io/healthcheck-timeout-seconds: '5'
+    alb.ingress.kubernetes.io/success-codes: '200'
+    alb.ingress.kubernetes.io/healthy-threshold-count: '2'
+    alb.ingress.kubernetes.io/unhealthy-threshold-count: '2'
+    # SSH settings
+    alb.ingress.kubernetes.io/listen-ports: '[{"HTTPS":443}, {"HTTP":80}]'
+    alb.ingress.kubernetes.io/certificate-arn: arn:aws:acm:us-east-1:262485716661:certificate/025378ec-5940-42a7-931c-e685aa66663e
+    # SSL Redirect Setting (http to https) all http will be redirected to https
+    alb.ingress.kubernetes.io/ssl-redirect: '443'
+    # External dns settings
+    external-dns.alpha.kubernetes.io/hostname: articles.beitcloud.com, argo.beitcloud.com
+spec:
+  defaultBackend:
+    service:
+      name: articles-nodeport-service
+      port:
+        number: 80
+  rules: 
+    - host: solar.beitcloud.com
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: solar-system-service
+                port: 
+                  number: 80
+    # - host: creative.beitcloud.com
+    #   http:
+    #     paths:
+    #       - path: /
+    #         pathType: Prefix
+    #         backend:
+    #           service:
+    #             name: creative-nodeport-service
+    #             port: 
+    #               number: 80
+    # - host: halloween.beitcloud.com
+    #   http:
+    #     paths:
+    #       - path: /
+    #         pathType: Prefix
+    #         backend:
+    #           service:
+    #             name: halloween-nodeport-service
+    #             port: 
+    #               number: 80
+    # - host: phone.beitcloud.com
+    #   http:
+    #     paths:
+    #       - path: /
+    #         pathType: Prefix
+    #         backend:
+    #           service:
+    #             name: phone-nodeport-service
+    #             port: 
+    #               number: 80
+    # - host: static.beitcloud.com
+    #   http:
+    #     paths:
+    #       - path: /
+    #         pathType: Prefix
+    #         backend:
+    #           service:
+    #             name: static-nodeport-service
+    #             port: 
+    #               number: 80
+    # - host: website.beitcloud.com
+    #   http:
+    #     paths:
+    #       - path: /
+    #         pathType: Prefix
+    #         backend:
+    #           service:
+    #             name: website-nodeport-service
+    #             port: 
+    #               number: 80
+   
