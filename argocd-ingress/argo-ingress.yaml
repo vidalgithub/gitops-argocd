@@ -44,16 +44,16 @@ spec:
                 name: solar-system-service
                 port: 
                   number: 80
-    # - host: creative.beitcloud.com
-    #   http:
-    #     paths:
-    #       - path: /
-    #         pathType: Prefix
-    #         backend:
-    #           service:
-    #             name: creative-nodeport-service
-    #             port: 
-    #               number: 80
+    - host: argoserver.beitcloud.com
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: argocd-server
+                port: 
+                  number: 80
     # - host: halloween.beitcloud.com
     #   http:
     #     paths:
