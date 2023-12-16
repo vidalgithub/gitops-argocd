@@ -31,7 +31,7 @@ metadata:
     app: solar-system
   name: solar-system-v2
 spec:
-  replicas: 0
+  replicas: 1
   selector:
     matchLabels:
       app: solar-system
@@ -77,8 +77,8 @@ spec:
     - destination:
         host: solar-system-service
         subset: v1
-      weight: 80
+      weight: 0
     - destination:
         host: solar-system-service
         subset: v2
-      weight: 20
+      weight: 100
