@@ -53,9 +53,9 @@ spec:
 apiVersion: networking.istio.io/v1alpha3
 kind: DestinationRule
 metadata:
-  name: my-service
+  name: solar-system
 spec:
-  host: my-service
+  host: solar-system-service
   subsets:
   - name: v1
     labels:
@@ -68,17 +68,17 @@ spec:
 apiVersion: networking.istio.io/v1alpha3
 kind: VirtualService
 metadata:
-  name: my-service
+  name: solar-system
 spec:
   hosts:
-  - my-service
+  - solar-system-service
   http:
   - route:
     - destination:
-        host: my-service
+        host: solar-system-service
         subset: v1
       weight: 80
     - destination:
-        host: my-service
+        host: solar-system-service
         subset: v2
       weight: 20
