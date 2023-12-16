@@ -3,7 +3,7 @@ kind: Deployment
 metadata:
   labels:
     app: solar-system
-  name: solar-system
+  name: solar-system-v1
 spec:
   replicas: 1
   selector:
@@ -14,6 +14,33 @@ spec:
     metadata:
       labels:
         app: solar-system
+        version: v1
+    spec:
+      containers:
+      - image: siddharth67/solar-system:v3
+        name: solar-system
+        imagePullPolicy: Always
+        ports: 
+        - containerPort: 80
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: solar-system
+  name: solar-system-v2
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: solar-system
+  strategy: {}
+  template:
+    metadata:
+      labels:
+        app: solar-system
+        version: v2
     spec:
       containers:
       - image: siddharth67/solar-system:v6
@@ -21,3 +48,37 @@ spec:
         imagePullPolicy: Always
         ports: 
         - containerPort: 80
+
+---
+apiVersion: networking.istio.io/v1alpha3
+kind: DestinationRule
+metadata:
+  name: my-service
+spec:
+  host: my-service
+  subsets:
+  - name: v1
+    labels:
+      version: v1
+  - name: v2
+    labels:
+      version: v2
+
+---
+apiVersion: networking.istio.io/v1alpha3
+kind: VirtualService
+metadata:
+  name: my-service
+spec:
+  hosts:
+  - my-service
+  http:
+  - route:
+    - destination:
+        host: my-service
+        subset: v1
+      weight: 80
+    - destination:
+        host: my-service
+        subset: v2
+      weight: 20
