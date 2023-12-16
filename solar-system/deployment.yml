@@ -77,8 +77,8 @@ spec:
     - destination:
         host: solar-system-service
         subset: v1
-      weight: 100
+      weight: 0
     - destination:
         host: solar-system-service
         subset: v2
-      weight: 0
+      weight: 100
