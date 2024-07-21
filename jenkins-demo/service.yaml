@@ -6,7 +6,7 @@ metadata:
   name: solar-system-service #extdns-tls-lbc-network-lb
   annotations:
     # Traffic Routing
-    service.beta.kubernetes.io/aws-load-balancer-name: solar-system-service #3extdns-tls-lbc-network-lb
+    service.beta.kubernetes.io/aws-load-balancer-name: feature-solar-system-service #3extdns-tls-lbc-network-lb
     service.beta.kubernetes.io/aws-load-balancer-type: external
     service.beta.kubernetes.io/aws-load-balancer-nlb-target-type: instance
     #service.beta.kubernetes.io/aws-load-balancer-subnets: subnet-xxxx, mySubnet ## Subnets are auto-discovered if this annotation is not specified, see Subnet Discovery for further details.
