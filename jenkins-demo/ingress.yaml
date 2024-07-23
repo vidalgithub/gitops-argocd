@@ -1,47 +1,49 @@
-apiVersion: v1
-kind: Service
+# Annotations Reference: https://kubernetes-sigs.github.io/aws-load-balancer-controller/latest/guide/ingress/annotations/
+#apiVersion: extensions/v1beta1
+apiVersion: networking.k8s.io/v1
+kind: Ingress
 metadata:
-  labels:
-    app: solar-system
-  name: solar-system-service #extdns-tls-lbc-network-lb
+  name: solar-system
+  namespace: main  
   annotations:
-    # Traffic Routing
-    service.beta.kubernetes.io/aws-load-balancer-name: solar-system-service #3extdns-tls-lbc-network-lb
-    service.beta.kubernetes.io/aws-load-balancer-type: external
-    service.beta.kubernetes.io/aws-load-balancer-nlb-target-type: instance
-    #service.beta.kubernetes.io/aws-load-balancer-subnets: subnet-xxxx, mySubnet ## Subnets are auto-discovered if this annotation is not specified, see Subnet Discovery for further details.
-    
+    # Load Balancer Name
+    alb.ingress.kubernetes.io/load-balancer-name: solar-system
+    # Ingress Core Settings  
+    #kubernetes.io/ingress.class: "alb" (OLD INGRESS CLASS NOTATION - STILL WORKS BUT RECOMMENDED TO USE IngressClass Resource)
+    alb.ingress.kubernetes.io/scheme: internet-facing    
     # Health Check Settings
-    service.beta.kubernetes.io/aws-load-balancer-healthcheck-protocol: http
-    service.beta.kubernetes.io/aws-load-balancer-healthcheck-port: traffic-port
-    service.beta.kubernetes.io/aws-load-balancer-healthcheck-path: /index.html
-    service.beta.kubernetes.io/aws-load-balancer-healthcheck-healthy-threshold: "3"
-    service.beta.kubernetes.io/aws-load-balancer-healthcheck-unhealthy-threshold: "3"
-    service.beta.kubernetes.io/aws-load-balancer-healthcheck-interval: "10" # The controller currently ignores the timeout configuration due to the limitations on the AWS NLB. The default timeout for TCP is 10s and HTTP is 6s.
-
-    # Access Control
-    service.beta.kubernetes.io/load-balancer-source-ranges: 0.0.0.0/0 
-    service.beta.kubernetes.io/aws-load-balancer-scheme: "internet-facing"
-
-    # AWS Resource Tags
-    service.beta.kubernetes.io/aws-load-balancer-additional-resource-tags: Environment=dev,Team=test
-
-    # TLS
-    service.beta.kubernetes.io/aws-load-balancer-ssl-cert: arn:aws:acm:us-east-1:262485716661:certificate/025378ec-5940-42a7-931c-e685aa66663e
-    service.beta.kubernetes.io/aws-load-balancer-ssl-ports: 443, # Specify this annotation if you need both TLS and non-TLS listeners on the same load balancer
-    service.beta.kubernetes.io/aws-load-balancer-ssl-negotiation-policy: ELBSecurityPolicy-TLS13-1-2-2021-06
-    service.beta.kubernetes.io/aws-load-balancer-backend-protocol: tcp 
-
+    alb.ingress.kubernetes.io/healthcheck-protocol: HTTP 
+    alb.ingress.kubernetes.io/healthcheck-port: traffic-port
+    #Important Note:  Need to add health check path annotations in service level if we are planning to use multiple targets in a load balancer    
+    alb.ingress.kubernetes.io/healthcheck-interval-seconds: '15'
+    alb.ingress.kubernetes.io/healthcheck-timeout-seconds: '5'
+    alb.ingress.kubernetes.io/success-codes: '200'
+    alb.ingress.kubernetes.io/healthy-threshold-count: '2'
+    alb.ingress.kubernetes.io/unhealthy-threshold-count: '2'
+    ## SSL Settings
+    alb.ingress.kubernetes.io/listen-ports: '[{"HTTPS":443}, {"HTTP":80}]'
+    #alb.ingress.kubernetes.io/certificate-arn: arn:aws:acm:us-east-1:1111111111:certificate/11111111-00000-ffff-aass-2222222222
+    #alb.ingress.kubernetes.io/ssl-policy: ELBSecurityPolicy-TLS-1-1-2017-01 #Optional (Picks default if not used)    
+    # SSL Redirect Setting
+    alb.ingress.kubernetes.io/ssl-redirect: '443'
     # External DNS - For creating a Record Set in Route53
-    external-dns.alpha.kubernetes.io/hostname: solar-system.beitcloud.com
+    external-dns.alpha.kubernetes.io/hostname: solar-system.beitcloud.com 
+    # Ingress Groups
+    alb.ingress.kubernetes.io/group.name: solar-system
+    alb.ingress.kubernetes.io/group.order: '10'
 spec:
-  type: LoadBalancer
-  selector:
-    app: solar-system #pp3-nginx
-  ports:
-    - name: http
-      port: 80
-      targetPort: 80    
-    - name: https
-      port: 443
-      targetPort: 80  
+  ingressClassName: my-aws-ingress-class   # Ingress Class
+  # SSL Certificate Discovery using TLS        
+  tls:
+  - hosts:
+    - "*.beitcloud.com"  
+  rules:  
+    - http:
+        paths:
+          - path: /ss
+            pathType: Prefix
+            backend:
+              service:
+                name: solar-system-service
+                port: 
+                  number: 80
