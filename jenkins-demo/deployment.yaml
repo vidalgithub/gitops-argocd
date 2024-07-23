@@ -16,7 +16,7 @@ spec:
         app: solar-system
     spec:
       containers:
-      - image: nginx:latest #vidaldocker/solar-system:29-11ab48347e51e6f94e3be805d7e831f0f170cb17
+      - image: stacksimplify/kube-nginxapp1:1.0.0 #vidaldocker/solar-system:29-11ab48347e51e6f94e3be805d7e831f0f170cb17
         name: solar-system
         ports: 
         - containerPort: 80
