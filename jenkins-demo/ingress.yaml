@@ -29,8 +29,8 @@ metadata:
     # External DNS - For creating a Record Set in Route53
     external-dns.alpha.kubernetes.io/hostname: solar-system.beitcloud.com 
     # Ingress Groups
-    alb.ingress.kubernetes.io/group.name: solar-system
-    alb.ingress.kubernetes.io/group.order: '10'
+    alb.ingress.kubernetes.io/group.name: myapps.web
+    alb.ingress.kubernetes.io/group.order: '110'
 spec:
   ingressClassName: my-aws-ingress-class   # Ingress Class
   # SSL Certificate Discovery using TLS        
@@ -40,7 +40,7 @@ spec:
   rules:  
     - http:
         paths:
-          - path: /ss
+          - path: /
             pathType: Prefix
             backend:
               service:
