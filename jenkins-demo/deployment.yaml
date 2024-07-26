@@ -16,7 +16,7 @@ spec:
         app: solar-system
     spec:
       containers:
-      - image: vidaldocker/solar-system:5-91f48ba6de34d2370f6babfbe97f5adf487a1000
+      - image: vidaldocker/solar-system:6-852a8be23f0128c56f8f69c7b34ac89f599cf724
         name: solar-system
         ports: 
         - containerPort: 80
